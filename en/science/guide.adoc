@@ -1,0 +1,17 @@
+= General guide
+
+* Metrics
+
+== Tools
+
+== Internals
+
+=== VisualStudio
+
+=== WinDbg
+
+=== SOS
+
+== Profling & Microbenchmarking tools
+
+See next section.

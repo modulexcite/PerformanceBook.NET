@@ -1,0 +1,19 @@
+[cs]
+----
+void Foo(params int[] x)
+{
+}
+
+void Main()
+{
+    Foo();
+}
+----
+
+[nasm]
+----
+IL_0001: ldarg.0
+IL_0002: ldc.i4.0
+IL_0003: newarr
+IL_0008: call
+----

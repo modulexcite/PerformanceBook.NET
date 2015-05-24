@@ -1,0 +1,11 @@
+= Value And Reference types
+
+== Internal structure
+
+== Boxing and unboxing
+
+== GetHashCode and friends
+
+== List vs IList
+
+== Struct default constructors

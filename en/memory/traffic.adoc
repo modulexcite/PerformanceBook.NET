@@ -1,0 +1,11 @@
+= Memory traffic
+
+== Params
+
+{% include "../../listings/memory/traffic/params.adoc" %}
+
+== Yield
+
+== Clousures
+
+== Deduplication

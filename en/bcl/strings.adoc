@@ -1,0 +1,15 @@
+= Strings
+
+== General
+
+== StringBuilder
+
+.NET 2 and .NET 4
+
+== Interning
+
+=== System
+
+=== Manual deduplication
+
+=== unsafe code

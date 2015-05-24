@@ -1,0 +1,27 @@
+= JIT
+
+== How to view asm
+
+== Cold start
+
+=== VisualStudio
+
+=== WinDbg
+
+=== CoreCLR and COMPLUS
+
+== SIMD
+
+LegacyJIT-x86, LegacyJIT-x64, RyuJIT: FPU, SSE2, AVX
+
+RyuJIT & Vectors
+
+== Array bound check elimination
+
+== Inlining
+
+== Loop unrolling
+
+== Constant folding
+
+== Tail call

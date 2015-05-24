@@ -1,0 +1,18 @@
+= WPF
+
+== Binding leaks
+
+* Simple
+* Collection
+
+== TextBox
+
+* Undo/Redo
+
+== Precomiled bindings
+
+New .NET: x:Bind
+
+== Misc
+
+* x:Name leak
