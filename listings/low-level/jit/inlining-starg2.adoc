@@ -1,0 +1,30 @@
+[cs]
+----
+int Calc() => WithoutStarg(0x11) + WithStarg(0x12);
+
+int WithoutStarg(int value) => value;
+
+int WithStarg(int value)
+{
+    if (value < 0)
+        value = -value;
+    return value;
+}
+----
+
+
+[nasm]
+----
+; LegacyJIT-x64
+mov         ecx,23h
+ret
+----
+
+
+[cs]
+---
+// RyuJIT-x64
+// Inline expansion aborted due to opcode 
+// [06] OP_starg.s in method 
+// Program:WithStarg(int):int:this
+----

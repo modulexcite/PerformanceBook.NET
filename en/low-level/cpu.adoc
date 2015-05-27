@@ -1,7 +1,39 @@
 = CPU
 
+TODO
+
 == x86 vs x64
+
+TODO
 
 == CPU Cache
 
+TODO
+
+*Example 1*
+
+{% include "../../listings/low-level/cpu/cache-simple.adoc" %}
+
+*Example 2*
+
+{% include "../../listings/low-level/cpu/cache-matrices.adoc" %}
+
+*Example 3*
+
+TODO: Cache-Conscious Binary Search
+
 == ILP
+
+TODO
+
+*Example 1*
+
+{% include "../../listings/low-level/cpu/ilp-inc.adoc" %}
+
+*Example 2*
+
+{% include "../../listings/low-level/cpu/ilp-max.adoc" %}
+
+*Example 3*
+
+{% include "../../listings/low-level/cpu/ilp-vs-bce.adoc" %}

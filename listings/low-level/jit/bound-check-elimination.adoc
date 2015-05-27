@@ -1,0 +1,124 @@
+[cs]
+----
+const int N = 11;
+int[] a = new int[N];
+// N
+for (int i = 0; i < N; i++)
+    sum += a[i];
+// a.Length
+for (int i = 0; i < a.Length; i++)
+    sum += a[i];
+----
+
+[nasm]
+----
+; LegacyJIT-x86, N
+; ...
+Loop:
+; if i >= a.Length
+|\colorbox{hcolor}{cmp      eax,edx}|
+; then throw Exception
+|\colorbox{hcolor}{jae      004635F9}|
+; sum += a[i]
+add      ecx,dword ptr [esi+eax*4+8]
+; i++
+inc      eax  
+; if i < N
+cmp      eax,0Bh  
+; then continue
+jl       Loop 
+
+; LegacyJIT-x86, a.Length
+; ...
+; ...
+; ...
+; ...
+; ...        
+Loop:    
+; sum += a[i]
+add      ecx,dword ptr [esi+edx*4+8]  
+; i++
+inc      edx  
+; if i < a.Length
+cmp      eax,edx  
+; then continue
+jg       Loop
+----
+
+[nasm]
+----
+; LegacyJIT-x64, N
+; ...
+Loop:
+; eax = x[i]
+mov      eax,dword ptr [r8+rcx+10h]  
+; sum += a[i]
+add      edx,eax
+; i++
+add      rcx,4  
+
+; if i < N
+cmp      rcx,2Ch  
+; then continue
+jl       Loop  
+
+; LegacyJIT-x64, a.Length
+; ...
+Loop:
+; eax = x[i]
+mov      eax,dword ptr [r9+r8+10h]  
+; sum += a[i]
+add      ecx,eax  
+; i++
+inc      edx  
+add      r8,4  
+; if i < N
+cmp      edx,r10d  
+; then continue
+jl       Loop
+----
+
+[nasm]
+----
+; RyuJIT-x64, N
+Loop:
+; r8 = a.Length
+mov      r8d,dword ptr [rax+8]
+; if i >= a.Length
+cmp      ecx,r8d
+; then throw exception
+jae      00007FF94F9B46B4
+; r8 = i
+movsxd   r8,ecx  
+; r8 = a[i]
+mov      r8d,dword ptr [rax+r8*4+10h]  
+; sum += a[i]
+add      edx,r8d  
+; i++
+inc      ecx              
+; if i < N
+cmp      ecx,0Bh  
+; then continue
+jl       Loop
+
+; RyuJIT-x64, a.Length
+; ...
+; ...
+; ...
+; ...
+; ...
+; ...
+Loop:
+; r9 = i
+movsxd   r9,ecx  
+; r9 = x[i]
+mov      r9d,dword ptr [rax+r9*4+10h]  
+; sum += x[i]
+add      edx,r9d  
+; i++
+inc      ecx  
+; if i < a.Length
+cmp      r8d,ecx 
+; then continue 
+jg       Loop
+----

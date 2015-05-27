@@ -2,17 +2,25 @@
 
 == Binding leaks
 
+TODO
+
 * Simple
 * Collection
 
 == TextBox
 
+TODO
+
 * Undo/Redo
 
 == Precomiled bindings
 
+TODO
+
 New .NET: x:Bind
 
 == Misc
+
+TODO
 
 * x:Name leak

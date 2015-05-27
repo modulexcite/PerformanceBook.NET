@@ -1,0 +1,48 @@
+[cs]
+----
+switch (x)
+{
+    case "a":
+        return "A";
+    case "b":
+        return "B";
+    case "c":
+        return "C";
+    case "d":
+        return "D";
+}    
+return "";
+----
+
+[nasm]
+----
+; Phase 1: switch
+IL_0007: ldloc.0
+IL_0008: ldstr "a"
+IL_000d: call bool String::op_Equality
+IL_0012: brtrue.s IL_003d
+IL_0014: ldloc.0
+IL_0015: ldstr "b"
+IL_001a: call bool String::op_Equality
+IL_001f: brtrue.s IL_0043
+IL_0021: ldloc.0
+IL_0022: ldstr "c"
+IL_0027: call bool String::op_Equality
+IL_002c: brtrue.s IL_0049
+IL_002e: ldloc.0
+IL_002f: ldstr "d"
+IL_0034: call bool String::op_Equality
+IL_0039: brtrue.s IL_004f
+IL_003b: br.s IL_0055
+; Phase 2: cases
+IL_003d: ldstr "A"
+IL_0042: ret
+IL_0043: ldstr "B"
+IL_0048: ret
+IL_0049: ldstr "C"
+IL_004e: ret
+IL_004f: ldstr "D"
+IL_0054: ret
+IL_0055: ldstr ""
+IL_005a: ret
+----

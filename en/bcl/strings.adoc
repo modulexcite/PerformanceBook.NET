@@ -1,15 +1,27 @@
 = Strings
 
+TODO
+
 == General
+
+TODO
 
 == StringBuilder
 
-.NET 2 and .NET 4
+TODO: .NET 2 and .NET 4 implementations
 
 == Interning
 
+TODO
+
 === System
+
+TODO
 
 === Manual deduplication
 
+TODO
+
 === unsafe code
+
+TODO

@@ -1,39 +1,49 @@
 = GC
 
+TODO
+
 == How it works?
+
+TODO
 
 == Event handlers leaks
 
-WeakRefrences
+TODO
+
+TODO: WeakRefrences
 
 == CriticalFinalizerObject
 
+TODO
+
 == Manual tuning
 
-GC.Collect
+TODO: GC.Collect
 
-Server/Client
+TODO: Server/Client
 
-GCLatencyMode
+TODO: GCLatencyMode
 
-MemoryFallPoint
+TODO: MemoryFallPoint
 
-AddMemoryPressure() and RemoveMemoryPressure()
+TODO: AddMemoryPressure() and RemoveMemoryPressure()
 
 == LOH
 
-Example with list of chunks
+TODO: Example with list of chunks
 
-.NET 4.5 & LargeObjectHeapCompactionMode
+TODO: .NET 4.5 & LargeObjectHeapCompactionMode
 
 == TryStartNoGCRegion
 
-(.NET 4.6)
+TODO: (.NET 4.6)
 
 == Object pooling
 
+TODO
+
 == Mono
 
-Boehm
+TODO: Boehm
 
-Sgen
+TODO: Sgen

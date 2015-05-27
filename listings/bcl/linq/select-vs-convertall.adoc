@@ -1,0 +1,12 @@
+[cs]
+----
+public List<int> Select()
+{
+    return list.Select(x => 2 * x).ToList();
+}
+
+public List<int> ConvertAll()
+{
+    return list.ConvertAll(x => 2 * x).ToList();
+}
+----

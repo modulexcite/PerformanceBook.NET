@@ -1,0 +1,49 @@
+[cs]
+----
+void Foo(Func<object> before, 
+         Func<object> after)
+{
+    before();
+    // Some logic
+    after();
+}
+void Run()
+{
+    var a = new object();
+    var b = new object();
+    Foo(() => a, () => b);
+}
+---
+
+[cs]
+----
+private void Run()
+{
+  Program.<>c__DisplayClass2 cDisplayClass2 = new Program.<>c__DisplayClass2();
+  cDisplayClass2.a = new object();
+  cDisplayClass2.b = new object();
+  this.Foo(new Func<object>((object) cDisplayClass2, __methodptr(<Run>b__0)), 
+                            new Func<object>((object) cDisplayClass2, __methodptr(<Run>b__1)));
+}
+[CompilerGenerated]
+private sealed class <>c__DisplayClass2
+{
+  public object a;
+  public object b;
+
+  public <>c__DisplayClass2()
+  {
+    base..ctor();
+  }
+
+  public object <Run>b__0()
+  {
+    return this.a;
+  }
+
+  public object <Run>b__1()
+  {
+    return this.b;
+  }
+}
+----

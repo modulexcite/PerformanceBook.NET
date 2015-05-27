@@ -1,0 +1,8 @@
+[cs]
+----
+int[] x = new int[64 * 1024 * 1024];
+for (int i = 0; i < x.Length; i++) 
+  x[i] *= 3;
+for (int i = 0; i < x.Length; i += 16) 
+  x[i] *= 3;
+----

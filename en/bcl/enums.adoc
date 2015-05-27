@@ -1,3 +1,9 @@
 = Enums
 
+TODO
+
 == HasFlags
+
+TODO
+
+{% include "../../listings/bcl/enums/hasflag.adoc" %}

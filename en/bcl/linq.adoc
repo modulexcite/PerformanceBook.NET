@@ -1,0 +1,11 @@
+= LINQ
+
+TODO
+
+== Examples
+
+TODO
+
+*Example 1*
+
+{% include "../../listings/bcl/linq/select-vs-convertall.adoc" %}

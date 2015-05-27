@@ -1,27 +1,72 @@
 = JIT
 
+== What is Just-in-time compilation
+
+TODO: general description, notes about cold startup
+
 == How to view asm
 
-== Cold start
+TODO
 
-=== VisualStudio
+=== Visual Studio
+
+TODO
 
 === WinDbg
 
-=== CoreCLR and COMPLUS
+TODO
+
+=== CoreCLR and dumps
+
+TODO
+
+* COMPLUS_JitDump
+* COMPLUS_JitDisasm
+* COMPLUS_JitDiffableDasm
+* COMPLUS_JitGCDump
+* COMPLUS_JitUnwindDump
+* COMPLUS_JitEHDump
+* COMPLUS_JitTimeLogFile
+* COMPLUS_JitTimeLogCsv
+
+See also: https://github.com/dotnet/coreclr/blob/master/Documentation/ryujit-overview.md[Book of the Runtime, JIT Compiler Structure].
+
+== Rejitting
+
+TODO
 
 == SIMD
 
-LegacyJIT-x86, LegacyJIT-x64, RyuJIT: FPU, SSE2, AVX
+TODO: LegacyJIT-x86, LegacyJIT-x64, RyuJIT: FPU, SSE2, AVX
 
-RyuJIT & Vectors
+TODO: RyuJIT & Vectors
 
 == Array bound check elimination
 
+TODO
+
+{% include "../../listings/low-level/jit/bound-check-elimination.adoc" %}
+
 == Inlining
+
+TODO
+
+{% include "../../listings/low-level/jit/inlining-starg1.adoc" %}
+
+TODO
+
+{% include "../../listings/low-level/jit/inlining-starg2.adoc" %}
 
 == Loop unrolling
 
+TODO
+
+{% include "../../listings/low-level/jit/loop-unrolling1.adoc" %}
+
 == Constant folding
 
+TODO
+
 == Tail call
+
+TODO

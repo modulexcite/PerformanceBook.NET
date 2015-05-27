@@ -1,0 +1,20 @@
+[cs]
+----
+private int[] a = new int[4];
+
+public void Parallel()
+{
+    a[0]++;
+    a[1]++;
+    a[2]++;
+    a[3]++;
+}
+
+public void Sequential()
+{
+    a[0]++;
+    a[0]++;
+    a[0]++;
+    a[0]++;
+}
+----

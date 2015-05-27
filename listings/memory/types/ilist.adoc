@@ -1,0 +1,21 @@
+[cs]
+----
+void Foo1(List<int> list)
+{
+    var start = GC.GetTotalMemory(true);
+    foreach (var i in list)
+        Console.WriteLine(GC.GetTotalMemory(true) - start);
+}
+void Foo2(IList<int> list)
+{
+    var start = GC.GetTotalMemory(true);
+    foreach (var i in list)
+        Console.WriteLine(GC.GetTotalMemory(true) - start);
+}
+void Run()
+{
+    var list = new List<int> { 1 };
+    Foo1(list);
+    Foo2(list);
+}
+----

@@ -1,13 +1,27 @@
 = Profiling
 
+TODO
+
 == VisualStudio
+
+TODO
 
 == PerfMonitor
 
+TODO
+
 == CLR Profiler
+
+TODO
 
 == dotTrace & dotMemory
 
+TODO
+
 == ANTS Memory Profiler
 
+TODO
+
 == SciTech .NET Memory Profiler
+
+TODO

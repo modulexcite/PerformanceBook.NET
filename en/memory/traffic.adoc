@@ -1,11 +1,35 @@
 = Memory traffic
 
+TODO
+
 == Params
+
+TODO
 
 {% include "../../listings/memory/traffic/params.adoc" %}
 
 == Yield
 
-== Clousures
+TODO
+
+{% include "../../listings/memory/traffic/yield.adoc" %}
+
+== Closures
+
+TODO
+
+*Example 1*
+
+{% include "../../listings/memory/traffic/closure1.adoc" %}
+
+*Example 2*
+
+{% include "../../listings/memory/traffic/closure2.adoc" %}
+
+*Example 3*
+
+{% include "../../listings/memory/traffic/closure3.adoc" %}
 
 == Deduplication
+
+TODO

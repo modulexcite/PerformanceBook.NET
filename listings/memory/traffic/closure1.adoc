@@ -1,0 +1,40 @@
+[cs]
+----
+void Foo(Func<int, int> inc) { }
+
+void Run()
+{
+    int y = 1;
+    Foo(x => x + y);
+}
+---
+
+[cs]
+----
+private void Foo(Func<int, int> inc)
+{
+}
+
+private void Run()
+{
+  Program.<>c__DisplayClass1 cDisplayClass1 = new Program.<>c__DisplayClass1();
+  cDisplayClass1.y = 1;
+  this.Foo(new Func<int, int>((object) cDisplayClass1, __methodptr(<>b__0)));
+}
+
+[CompilerGenerated]
+private sealed class <>c__DisplayClass1
+{
+  public int y;
+
+  public <>c__DisplayClass1()
+  {
+    base..ctor();
+  }
+
+  public int <Run>b__0(int x)
+  {
+    return x + this.y;
+  }
+}
+----

@@ -1,7 +1,15 @@
 = Compilation
 
+TODO
+
 == NGen
+
+TODO
 
 === MPGO
 
+TODO
+
 == .NET Native
+
+TODO

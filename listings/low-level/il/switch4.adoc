@@ -1,0 +1,98 @@
+[cs]
+----
+switch (x)
+{
+    case "a":
+        return "A";
+    case "b":
+        return "B";
+    case "c":
+        return "C";
+    case "d":
+        return "D";
+    case "e":
+        return "E";
+    case "f":
+        return "F";
+    case "g":
+        return "G";
+}    
+return "";
+----
+
+[nasm]
+----
+; Old compiler
+; Phase 0: Dictionary<string, string>
+IL_000d: volatile.
+IL_000f: ldsfld class  Dictionary<string, int32>
+IL_0014: brtrue.s IL_0077
+IL_0016: ldc.i4.7
+IL_0017: newobj instance void class Dictionary<string, int32>::.ctor
+IL_001c: dup
+IL_001d: ldstr "a"
+IL_0022: ldc.i4.0
+IL_0023: call instance void class Dictionary<string, int32>::Add
+IL_0028: dup
+IL_0029: ldstr "b"
+IL_002e: ldc.i4.1
+IL_0023: call instance void class Dictionary<string, int32>::Add
+IL_0034: dup
+IL_0035: ldstr "c"
+; ...
+; Phase 1: 
+IL_0088: ldloc.1
+IL_0089: switch (
+  IL_00ac, IL_00b2, IL_00b8, 
+  IL_00be, IL_00c4, IL_00ca, IL_00d0)
+IL_00aa: br.s IL_00d6
+; Phase 2: cases
+IL_00ac: ldstr "A"
+IL_00b1: ret
+IL_00b2: ldstr "B"
+IL_00b7: ret
+IL_00b8: ldstr "C"
+IL_00bd: ret
+IL_00be: ldstr "D"
+IL_00c3: ret
+IL_00c4: ldstr "E"
+IL_00c9: ret
+IL_00ca: ldstr "F"
+IL_00cf: ret
+IL_00d0: ldstr "G"
+IL_00d5: ret
+IL_00d6: ldstr ""
+IL_00db: ret
+----
+
+[cs]
+----
+// Roslyn
+// Phase 1: ComputeStringHash
+uint num = ComputeStringHash(x);
+// Phase 2: Бинарный поиск
+if (num <= 3792446982u)
+    if (num != 3758891744u)
+        if (num != 3775669363u)
+            if (num == 3792446982u)
+                if (text == "g")
+                    return "G";
+        else if (text == "d")
+            return "D";
+    else if (text == "e")
+        return "E";
+else if (num <= 3826002220u)
+    if (num != 3809224601u)
+        if (num == 3826002220u)
+            if (text == "a")
+                return "A";
+    else if (text == "f")
+        return "F";
+else if (num != 3859557458u)
+    if (num == 3876335077u)
+        if (text == "b")
+            return "B";
+else if (text == "c")
+    return "C";
+return "";
+----

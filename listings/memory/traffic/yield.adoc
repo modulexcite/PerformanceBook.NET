@@ -1,0 +1,29 @@
+[cs]
+----
+IEnumerable<int> Foo()
+{
+    for (int i = 0; i < 5; i++) 
+        yield return i;
+}
+----
+
+[nasm]
+----
+private IEnumerable<int> Foo()
+{
+  Program.<Foo>d__0 fooD0 = new Program.<Foo>d__0(-2);
+  fooD0.<>4__this = this;
+  return (IEnumerable<int>) fooD0;
+}
+
+[CompilerGenerated]
+private sealed class <Foo>d__0 : IEnumerable<int>, IEnumerable, 
+  CIEnumerator<int>, IEnumerator, IDisposable
+{
+  private int <>2__current;
+  private int <>1__state;
+  private int <>l__initialThreadId;
+  public int <i>5__1;
+  public Program <>4__this;
+  ...
+----

@@ -1,17 +1,29 @@
 = General guide
 
+TODO
+
 * Metrics
 
 == Tools
 
+TODO
+
 == Internals
+
+TODO
 
 === VisualStudio
 
+TODO
+
 === WinDbg
+
+TODO
 
 === SOS
 
+TODO
+
 == Profling & Microbenchmarking tools
 
-See next section.
+TODO: See next section.
