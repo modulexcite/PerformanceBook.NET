@@ -1,0 +1,252 @@
+= Memory traffic
+
+There is a lot of syntax sugar in C#. On the one hand, it is good: it allows us to write concise and expressive source code. On the other hand, it is bad: some developers don't always understand what exactly they write. In this section, we talk about implicit and explicit object allocation (or memory traffic).
+
+== Params
+
+There is the `params` keyword that helps us to create methods with variable number of arguments:
+
+[source,cs]
+----
+void Foo(params int[] x)
+{
+    // ...
+}
+----
+
+It is a good approach for some cases. However, it hides from developers some of implicit object allocation. For example, what happens if you call such method without arguments:
+
+[source,cs]
+----
+Foo();
+----
+
+It depends. Old compilers generate the following IL code:
+
+[source]
+----
+IL_0000: ldarg.0
+IL_0001: ldc.i4.0
+IL_0002: newarr    System.Int32
+IL_0007: call      void Foo(int32[])
+IL_000C: ret
+----
+
+As you can see, a new empty array was created. It means that you will have an object allocation per each method invocation without arguments.
+
+If you use Roslyn and .NET 4.6, the IL may differ:
+
+[source]
+----
+IL_0000: ldarg.0
+IL_0001: call      System.Array::Empty<int32>()
+IL_0007: call      void Foo(int32[])
+IL_000B: ret
+----
+
+In this case, static https://msdn.microsoft.com/en-us/library/dn906179.aspx[Array.Empty<T>] was used. It means that you shouldn't worry about unwanted memory allocation.
+
+IMPORTANT: Invocation of method with variable number of argument without any arguments can produce allocation of an emtpy array (old versions of the C# compiler and Roslyn + old versions of the .NET Framework).
+
+Anyway, how we can suppress this behavior to avoid unwanted memory allocations? We can write overloaded version of our method for small amount of arguments:
+
+[source,cs]
+----
+void Foo()
+{
+    // ...
+}
+void Foo(int x1)
+{
+    // ...
+}
+void Foo(int x1, int x2)
+{
+    // ...
+}
+// ...
+----
+
+You can often see this approach in BCL. An excellent example is the `WriteLine` method of the `System.Console` class:
+
+[source,cs]
+----
+public static void WriteLine(String value);
+public static void WriteLine(String format, Object arg0);
+public static void WriteLine(String format, Object arg0, Object arg1);
+public static void WriteLine(String format, Object arg0, Object arg1, Object arg2);
+public static void WriteLine(String format, params Object[] arg);
+----
+
+== Yield
+
+TODO
+
+[source,cs]
+----
+IEnumerable<int> Foo()
+{
+    for (int i = 0; i < 5; i++) 
+        yield return i;
+}
+----
+
+[source,asm]
+----
+private IEnumerable<int> Foo()
+{
+  Program.<Foo>d__0 fooD0 = new Program.<Foo>d__0(-2);
+  fooD0.<>4__this = this;
+  return (IEnumerable<int>) fooD0;
+}
+
+[CompilerGenerated]
+private sealed class <Foo>d__0 : IEnumerable<int>, IEnumerable, 
+  CIEnumerator<int>, IEnumerator, IDisposable
+{
+  private int <>2__current;
+  private int <>1__state;
+  private int <>l__initialThreadId;
+  public int <i>5__1;
+  public Program <>4__this;
+  ...
+----
+
+== Closures
+
+TODO
+
+*Example 1*
+
+[source,cs]
+----
+void Foo(Func<int, int> inc) { }
+
+void Run()
+{
+    int y = 1;
+    Foo(x => x + y);
+}
+----
+
+[source,cs]
+----
+private void Foo(Func<int, int> inc)
+{
+}
+
+private void Run()
+{
+  Program.<>c__DisplayClass1 cDisplayClass1 = new Program.<>c__DisplayClass1();
+  cDisplayClass1.y = 1;
+  this.Foo(new Func<int, int>((object) cDisplayClass1, __methodptr(<>b__0)));
+}
+
+[CompilerGenerated]
+private sealed class <>c__DisplayClass1
+{
+  public int y;
+
+  public <>c__DisplayClass1()
+  {
+    base..ctor();
+  }
+
+  public int <Run>b__0(int x)
+  {
+    return x + this.y;
+  }
+}
+----
+
+*Example 2*
+
+[source,cs]
+----
+void Foo(Func<object> before, 
+         Func<object> after)
+{
+    before();
+    // Some logic
+    after();
+}
+void Run()
+{
+    var a = new object();
+    var b = new object();
+    Foo(() => a, () => b);
+}
+----
+
+[source,cs]
+----
+private void Run()
+{
+  Program.<>c__DisplayClass2 cDisplayClass2 = new Program.<>c__DisplayClass2();
+  cDisplayClass2.a = new object();
+  cDisplayClass2.b = new object();
+  this.Foo(new Func<object>((object) cDisplayClass2, __methodptr(<Run>b__0)), 
+                            new Func<object>((object) cDisplayClass2, __methodptr(<Run>b__1)));
+}
+[CompilerGenerated]
+private sealed class <>c__DisplayClass2
+{
+  public object a;
+  public object b;
+
+  public <>c__DisplayClass2()
+  {
+    base..ctor();
+  }
+
+  public object <Run>b__0()
+  {
+    return this.a;
+  }
+
+  public object <Run>b__1()
+  {
+    return this.b;
+  }
+}
+----
+
+*Example 3*
+
+[source,cs]
+----
+void Foo(Func<int, int> inc) { }
+static int y = 1;
+static int StaticInc(int x) { return x + y; }
+
+void Run()
+{            
+    Foo(x => StaticInc(x));
+    Foo(StaticInc);
+}
+----
+
+[source,cs]
+----
+private void Run()
+{
+  if (Program.CS$<>9__CachedAnonymousMethodDelegate1 == null)
+  {
+    Program.CS$<>9__CachedAnonymousMethodDelegate1 = 
+      new Func<int, int>((object) null, __methodptr(<Run>b__0));
+  }
+  this.Foo(Program.CS$<>9__CachedAnonymousMethodDelegate1);
+  this.Foo(new Func<int, int>((object) null, __methodptr(StaticInc)));
+}
+[CompilerGenerated]
+private static int <Run>b__0(int x)
+{
+  return Program.StaticInc(x);
+}
+[CompilerGenerated]
+private static Func<int, int> CS$<>9__CachedAnonymousMethodDelegate1;
+----
+
+== Deduplication
+
+TODO

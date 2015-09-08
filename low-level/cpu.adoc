@@ -1,0 +1,120 @@
+= CPU
+
+TODO
+
+== x86 vs x64
+
+TODO
+
+== CPU Cache
+
+TODO
+
+*Example 1*
+
+[source,cs]
+----
+int[] x = new int[64 * 1024 * 1024];
+for (int i = 0; i < x.Length; i++) 
+  x[i] *= 3;
+for (int i = 0; i < x.Length; i += 16) 
+  x[i] *= 3;
+----
+
+*Example 2*
+
+[source,cs]
+----
+// Standard
+for (k = 0; k < n; k++)
+  for (i = 0; i < n; i++)
+    for (j = 0; j < n; j++)
+      c[k][i] = c[k][i] + a[k][j]*b[j][i];
+// Optimized
+for (k = 0; k < n; k++)
+   for (i = 0; i < n; i++)
+      for (j = 0; j < n; j++)
+         c[i][j] = c[i][j] + a[i][k]*b[k][j];
+----
+
+*Example 3*
+
+TODO: Cache-Conscious Binary Search
+
+== ILP
+
+TODO
+
+*Example 1*
+
+[source,cs]
+----
+private double a, b, c, d;
+
+public void Parallel()
+{
+    a++;
+    b++;
+    c++;
+    d++;
+}
+
+public void Sequential()
+{
+    a++;
+    a++;
+    a++;
+    a++;
+}
+----
+
+*Example 2*
+
+[source,cs]
+----
+private int[] x = new int[32];
+
+public int Max()
+{
+    var y = x;
+    int max = int.MinValue;
+    for (int i = 0; i < y.Length; i++)
+        max = Math.Max(max, x[i]);
+    return max;
+}
+
+public int MaxEvenOdd()
+{
+    var y = x;
+    int maxEven = int.MinValue, maxOdd = int.MinValue;
+    for (int i = 0; i < y.Length; i += 2)
+    {
+        maxEven = Math.Max(maxEven, y[i]);
+        maxOdd = Math.Max(maxOdd, y[i + 1]);
+    }
+    return Math.Max(maxEven, maxOdd);
+}
+----
+
+*Example 3*
+
+[source,cs]
+----
+private int[] a = new int[4];
+
+public void Parallel()
+{
+    a[0]++;
+    a[1]++;
+    a[2]++;
+    a[3]++;
+}
+
+public void Sequential()
+{
+    a[0]++;
+    a[0]++;
+    a[0]++;
+    a[0]++;
+}
+----

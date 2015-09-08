@@ -1,0 +1,290 @@
+= IL
+
+TODO
+
+== Readonly fields
+
+TODO
+
+[source,cs]
+----
+public struct Int256
+{
+    private readonly long bits0, bits1, bits2, bits3;
+
+    public Int256(long bits0, long bits1, long bits2, long bits3)
+    {
+        this.bits0 = bits0;
+        this.bits1 = bits1;
+        this.bits2 = bits2;
+        this.bits3 = bits3;
+    }
+
+    public long Bits0 => bits0;
+    public long Bits1 => bits1;
+    public long Bits2 => bits2;
+    public long Bits3 => bits3;
+}
+private Int256 a = new Int256(1L, 5L, 10L, 100L);
+private readonly Int256 b = new Int256(1L, 5L, 10L, 100L);
+public long GetValue() => a.Bits0 + a.Bits1 + a.Bits2 + a.Bits3;
+public long GetReadOnlyValue() => b.Bits0 + b.Bits1 + b.Bits2 + b.Bits3;
+----
+
+[source,asm]
+----
+; GetValue
+IL_0000: ldarg.0
+IL_0001: ldflda valuetype Program::a
+IL_0006: call instance int64 Int256::get_Bits0()
+
+; GetReadOnlyValue
+IL_0000: ldarg.0
+IL_0001: ldfld valuetype Program::b
+IL_0006: |\colorbox{hcolor}{stloc.0}|
+IL_0007: |\colorbox{hcolor}{ldloca.s 0}|
+IL_0009: call instance int64 Int256::get_Bits0()
+----
+
+== Switch
+
+TODO
+
+*Example 1*
+
+[source,cs]
+----
+switch (x)
+{
+    case 0:
+        return 0;
+    case 1:
+        return 1;
+    case 2:
+        return 2;
+    case 3:
+        return 3;
+}
+return -1;
+----
+
+[source,asm]
+----
+; Phase 1: switch
+IL_0008: switch (IL_001f, IL_0021, IL_0023, IL_0025)
+IL_001d: br.s IL_0027
+
+; Phase 2: cases
+IL_001f: ldc.i4.0
+IL_0020: ret    
+IL_0021: ldc.i4.1
+IL_0022: ret    
+IL_0023: ldc.i4.2
+IL_0024: ret    
+IL_0025: ldc.i4.3
+IL_0026: ret    
+IL_0027: ldc.i4.m1
+IL_0028: ret  
+----
+
+*Example 2*
+
+[source,cs]
+----
+switch (x)
+{
+    case 0:
+        return 0;
+    case 1000:
+        return 1000;
+    case 2000:
+        return 2000;
+    case 3000:
+        return 3000;
+}    
+return -1;
+----
+
+[source,asm]
+----
+; Phase 1: switch
+IL_0007: ldloc.0
+IL_0008: ldc.i4 1000
+IL_000d: bgt.s IL_001c            
+IL_000f: ldloc.0
+IL_0010: brfalse.s IL_002e            
+IL_0012: ldloc.0
+IL_0013: ldc.i4 1000
+IL_0018: beq.s IL_0030            
+IL_001a: br.s IL_0042            
+IL_001c: ldloc.0
+IL_001d: ldc.i4 2000
+IL_0022: beq.s IL_0036            
+IL_0024: ldloc.0
+IL_0025: ldc.i4 3000
+IL_002a: beq.s IL_003c            
+IL_002c: br.s IL_0042
+; Phase 2: cases
+IL_002e: ldc.i4.0
+IL_002f: ret            
+IL_0030: ldc.i4 1000
+IL_0035: ret            
+IL_0036: ldc.i4 2000
+IL_003b: ret            
+IL_003c: ldc.i4 3000
+IL_0041: ret            
+IL_0042: ldc.i4.m1
+IL_0043: ret
+----
+
+*Example 3*
+
+[source,cs]
+----
+switch (x)
+{
+    case "a":
+        return "A";
+    case "b":
+        return "B";
+    case "c":
+        return "C";
+    case "d":
+        return "D";
+}    
+return "";
+----
+
+[source,asm]
+----
+; Phase 1: switch
+IL_0007: ldloc.0
+IL_0008: ldstr "a"
+IL_000d: call bool String::op_Equality
+IL_0012: brtrue.s IL_003d
+IL_0014: ldloc.0
+IL_0015: ldstr "b"
+IL_001a: call bool String::op_Equality
+IL_001f: brtrue.s IL_0043
+IL_0021: ldloc.0
+IL_0022: ldstr "c"
+IL_0027: call bool String::op_Equality
+IL_002c: brtrue.s IL_0049
+IL_002e: ldloc.0
+IL_002f: ldstr "d"
+IL_0034: call bool String::op_Equality
+IL_0039: brtrue.s IL_004f
+IL_003b: br.s IL_0055
+; Phase 2: cases
+IL_003d: ldstr "A"
+IL_0042: ret
+IL_0043: ldstr "B"
+IL_0048: ret
+IL_0049: ldstr "C"
+IL_004e: ret
+IL_004f: ldstr "D"
+IL_0054: ret
+IL_0055: ldstr ""
+IL_005a: ret
+----
+
+*Example 4*
+
+[source,cs]
+----
+switch (x)
+{
+    case "a":
+        return "A";
+    case "b":
+        return "B";
+    case "c":
+        return "C";
+    case "d":
+        return "D";
+    case "e":
+        return "E";
+    case "f":
+        return "F";
+    case "g":
+        return "G";
+}    
+return "";
+----
+
+[source,asm]
+----
+; Old compiler
+; Phase 0: Dictionary<string, string>
+IL_000d: volatile.
+IL_000f: ldsfld class  Dictionary<string, int32>
+IL_0014: brtrue.s IL_0077
+IL_0016: ldc.i4.7
+IL_0017: newobj instance void class Dictionary<string, int32>::.ctor
+IL_001c: dup
+IL_001d: ldstr "a"
+IL_0022: ldc.i4.0
+IL_0023: call instance void class Dictionary<string, int32>::Add
+IL_0028: dup
+IL_0029: ldstr "b"
+IL_002e: ldc.i4.1
+IL_0023: call instance void class Dictionary<string, int32>::Add
+IL_0034: dup
+IL_0035: ldstr "c"
+; ...
+; Phase 1: 
+IL_0088: ldloc.1
+IL_0089: switch (
+  IL_00ac, IL_00b2, IL_00b8, 
+  IL_00be, IL_00c4, IL_00ca, IL_00d0)
+IL_00aa: br.s IL_00d6
+; Phase 2: cases
+IL_00ac: ldstr "A"
+IL_00b1: ret
+IL_00b2: ldstr "B"
+IL_00b7: ret
+IL_00b8: ldstr "C"
+IL_00bd: ret
+IL_00be: ldstr "D"
+IL_00c3: ret
+IL_00c4: ldstr "E"
+IL_00c9: ret
+IL_00ca: ldstr "F"
+IL_00cf: ret
+IL_00d0: ldstr "G"
+IL_00d5: ret
+IL_00d6: ldstr ""
+IL_00db: ret
+----
+
+[source,cs]
+----
+// Roslyn
+// Phase 1: ComputeStringHash
+uint num = ComputeStringHash(x);
+// Phase 2: Бинарный поиск
+if (num <= 3792446982u)
+    if (num != 3758891744u)
+        if (num != 3775669363u)
+            if (num == 3792446982u)
+                if (text == "g")
+                    return "G";
+        else if (text == "d")
+            return "D";
+    else if (text == "e")
+        return "E";
+else if (num <= 3826002220u)
+    if (num != 3809224601u)
+        if (num == 3826002220u)
+            if (text == "a")
+                return "A";
+    else if (text == "f")
+        return "F";
+else if (num != 3859557458u)
+    if (num == 3876335077u)
+        if (text == "b")
+            return "B";
+else if (text == "c")
+    return "C";
+return "";
+----

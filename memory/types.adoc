@@ -1,0 +1,61 @@
+= Value And Reference types
+
+TODO
+
+== Internal structure
+
+TODO
+
+== Boxing and unboxing
+
+TODO
+
+== GetHashCode and friends
+
+TODO
+
+== List vs IList
+
+TODO
+
+[source,cs]
+----
+void Foo1(List<int> list)
+{
+    var start = GC.GetTotalMemory(true);
+    foreach (var i in list)
+        Console.WriteLine(GC.GetTotalMemory(true) - start);
+}
+void Foo2(IList<int> list)
+{
+    var start = GC.GetTotalMemory(true);
+    foreach (var i in list)
+        Console.WriteLine(GC.GetTotalMemory(true) - start);
+}
+void Run()
+{
+    var list = new List<int> { 1 };
+    Foo1(list);
+    Foo2(list);
+}
+----
+
+== SmallList
+
+TODO
+
+[source,cs]
+----
+struct SmallList<T> : IList<T>
+{
+    private T item1;
+    private T item2;
+    private T item3;
+    private List<T> otherItems;
+    public List<T> ToList() { ... }
+}
+----
+
+== Struct default constructors
+
+TODO

@@ -1,0 +1,267 @@
+= JIT
+
+== What is Just-in-time compilation
+
+TODO: general description, notes about cold startup
+
+== How to view asm
+
+TODO
+
+=== Visual Studio
+
+TODO
+
+=== WinDbg
+
+TODO
+
+=== CoreCLR and dumps
+
+TODO
+
+* `COMPLUS_JitDump`
+* `COMPLUS_JitDisasm`
+* `COMPLUS_JitDiffableDasm`
+* `COMPLUS_JitGCDump`
+* `COMPLUS_JitUnwindDump`
+* `COMPLUS_JitEHDump`
+* `COMPLUS_JitTimeLogFile`
+* `COMPLUS_JitTimeLogCsv`
+
+See also: https://github.com/dotnet/coreclr/blob/master/Documentation/ryujit-overview.md[Book of the Runtime, JIT Compiler Structure].
+
+== Rejitting
+
+TODO
+
+== SIMD
+
+TODO: LegacyJIT-x86, LegacyJIT-x64, RyuJIT: FPU, SSE2, AVX
+
+TODO: RyuJIT & Vectors
+
+== Array bound check elimination
+
+TODO
+
+[source,cs]
+----
+const int N = 11;
+int[] a = new int[N];
+// N
+for (int i = 0; i < N; i++)
+    sum += a[i];
+// a.Length
+for (int i = 0; i < a.Length; i++)
+    sum += a[i];
+----
+
+[source,asm]
+----
+; LegacyJIT-x86, N
+; ...
+Loop:
+; if i >= a.Length
+|\colorbox{hcolor}{cmp      eax,edx}|
+; then throw Exception
+|\colorbox{hcolor}{jae      004635F9}|
+; sum += a[i]
+add      ecx,dword ptr [esi+eax*4+8]
+; i++
+inc      eax  
+; if i < N
+cmp      eax,0Bh  
+; then continue
+jl       Loop 
+
+; LegacyJIT-x86, a.Length
+; ...
+; ...
+; ...
+; ...
+; ...        
+Loop:    
+; sum += a[i]
+add      ecx,dword ptr [esi+edx*4+8]  
+; i++
+inc      edx  
+; if i < a.Length
+cmp      eax,edx  
+; then continue
+jg       Loop
+----
+
+[source,asm]
+----
+; LegacyJIT-x64, N
+; ...
+Loop:
+; eax = x[i]
+mov      eax,dword ptr [r8+rcx+10h]  
+; sum += a[i]
+add      edx,eax
+; i++
+add      rcx,4  
+
+; if i < N
+cmp      rcx,2Ch  
+; then continue
+jl       Loop  
+
+; LegacyJIT-x64, a.Length
+; ...
+Loop:
+; eax = x[i]
+mov      eax,dword ptr [r9+r8+10h]  
+; sum += a[i]
+add      ecx,eax  
+; i++
+inc      edx  
+add      r8,4  
+; if i < N
+cmp      edx,r10d  
+; then continue
+jl       Loop
+----
+
+[source,asm]
+----
+; RyuJIT-x64, N
+Loop:
+; r8 = a.Length
+mov      r8d,dword ptr [rax+8]
+; if i >= a.Length
+cmp      ecx,r8d
+; then throw exception
+jae      00007FF94F9B46B4
+; r8 = i
+movsxd   r8,ecx  
+; r8 = a[i]
+mov      r8d,dword ptr [rax+r8*4+10h]  
+; sum += a[i]
+add      edx,r8d  
+; i++
+inc      ecx              
+; if i < N
+cmp      ecx,0Bh  
+; then continue
+jl       Loop
+
+; RyuJIT-x64, a.Length
+; ...
+; ...
+; ...
+; ...
+; ...
+; ...
+Loop:
+; r9 = i
+movsxd   r9,ecx  
+; r9 = x[i]
+mov      r9d,dword ptr [rax+r9*4+10h]  
+; sum += x[i]
+add      edx,r9d  
+; i++
+inc      ecx  
+; if i < a.Length
+cmp      r8d,ecx 
+; then continue 
+jg       Loop
+----
+
+== Inlining
+
+TODO
+
+[source,cs]
+----
+// mscorlib/system/decimal.cs,158
+// Constructs a Decimal from an integer value.
+public Decimal(int value) {
+  // JIT today can't inline methods that contains "starg" 
+  // opcode. For more details, see DevDiv Bugs 81184: 
+  // x86 JIT CQ: Removing the inline striction of "starg".
+  int value_copy = value;
+  if (value_copy >= 0) {
+    flags = 0;
+  }
+  else {
+    flags = SignMask;
+    value_copy = -value_copy;
+  }
+  lo = value_copy;
+  mid = 0;
+  hi = 0;
+}
+----
+
+TODO
+
+[source,cs]
+----
+int Calc() => WithoutStarg(0x11) + WithStarg(0x12);
+
+int WithoutStarg(int value) => value;
+
+int WithStarg(int value)
+{
+    if (value < 0)
+        value = -value;
+    return value;
+}
+----
+
+
+[source,nasm]
+----
+; LegacyJIT-x64
+mov         ecx,23h
+ret
+----
+
+
+[source,cs]
+---
+// RyuJIT-x64
+// Inline expansion aborted due to opcode 
+// [06] OP_starg.s in method 
+// Program:WithStarg(int):int:this
+----
+
+== Loop unrolling
+
+TODO
+
+[source,cs]
+----
+int sum = 0;
+for (int i = 0; i < 1024; i++)
+    sum += i;
+----
+
+[source,asm]
+----
+; LegacyJIT-x64
+xor         ecx,ecx  
+mov         edx,1  
+Loop: 
+lea         eax,[rdx-1]  
+add         ecx,eax      ; sum += (i)
+add         ecx,edx      ; sum += (i+1)
+lea         eax,[rdx+1]  
+add         ecx,eax      ; sum += (i+2)
+lea         eax,[rdx+2]  
+add         ecx,eax      ; sum += (i+3)
+add         edx,4        ; i += 4
+cmp         edx,401h  
+jl          Loop  
+----
+
+== Constant folding
+
+TODO
+
+== Tail call
+
+TODO

@@ -1,0 +1,9 @@
+= Glossary
+
+== FPU
+
+https://en.wikipedia.org/wiki/Floating-point_unit[Floating-point unit]
+
+== BCL
+
+https://en.wikipedia.org/wiki/Standard_Libraries_%28CLI%29#Base_Class_Library[Base Class Library]

@@ -1,4 +1,14 @@
-[cs]
+= LINQ
+
+TODO
+
+== Examples
+
+TODO
+
+*Example 1*
+
+[source,cs]
 ----
 public List<int> Select()
 {
